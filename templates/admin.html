@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - Guest List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 16px; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #f4f4f4; }
+    a.button, button.button {
+      padding: 6px 12px; background:#007bff; color:#fff; text-decoration:none;
+      border-radius:4px; border:none; cursor:pointer;
+    }
+    a.button:hover { background:#0056b3; }
+    button.delete { background:#dc3545; }
+    button.delete:hover { background:#a71d2a; }
+
+    /* Mobile card layout */
+    @media (max-width: 640px) {
+      table, thead, tbody, tr, th, td { display: block; }
+      thead { display: none; }
+      tr {
+        background: #fdfdfd; border: 1px solid #ddd;
+        margin-bottom: 12px; border-radius: 6px; padding: 10px;
+      }
+      td { border: none; padding: 6px 10px; }
+      td:before {
+        display: block; font-weight: bold; margin-bottom: 2px; color: #555;
+      }
+      td:nth-of-type(1):before { content: "First Name"; }
+      td:nth-of-type(2):before { content: "Last Name"; }
+      td:nth-of-type(3):before { content: "Nickname"; }
+      td:nth-of-type(4):before { content: "Table #"; }
+      td:nth-of-type(5):before { content: "Actions"; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Admin – Guest List</h2>
+
+  <div class="row">
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <label>Upload Excel (bulk update):</label>
+      <input type="file" name="file" accept=".xlsx" required>
+      <button type="submit" class="button">Upload</button>
+    </form>
+
+    <!-- If running locally with default ports -->
+    <a class="button" href="http://127.0.0.1:5000/qr" target="_blank">Open Guest QR</a>
+
+    <a class="button" href="/download">Download Current Guest List</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>First</th><th>Last</th><th>Nickname</th><th>Table</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for guest in guests %}
+      <tr>
+        <td>{{ guest.first }}</td>
+        <td>{{ guest.last }}</td>
+        <td>{{ guest.nick }}</td>
+        <td>{{ guest.table }}</td>
+        <td>
+          <a class="button" href="/edit/{{ loop.index0 }}">Edit</a>
+          <form action="/delete/{{ loop.index0 }}" method="POST" style="display:inline;">
+            <button type="submit" class="button delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

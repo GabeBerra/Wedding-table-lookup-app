@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: wedding-guest-site
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -b 0.0.0.0:$PORT app:app
+    plan: free
+    envVars:
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_KEY
+        value: data.xlsx
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+  - type: web
+    name: wedding-admin-site
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -b 0.0.0.0:$PORT admin:app
+    plan: free
+    envVars:
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_KEY
+        value: data.xlsx
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASS
+        sync: false

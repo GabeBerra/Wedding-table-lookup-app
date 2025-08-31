@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scan to Find Your Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Georgia, serif; text-align: center; padding: 32px; color: #4a3c3c; }
+    .card {
+      display: inline-block; background: #fff; padding: 24px; border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.08); max-width: 520px;
+    }
+    h2 { font-family: 'Great Vibes', cursive; font-size: 40px; margin: 6px 0 16px; color: #a05278; }
+    p { margin: 8px 0 18px; }
+    img { width: 280px; height: 280px; }
+    .hint { color: #777; font-size: 14px; margin-top: 10px; }
+    @media (max-width: 480px) { img { width: 220px; height: 220px; } }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="card">
+    <h2>💍 Find Your Table 💐</h2>
+    <p>Open your camera and scan this code:</p>
+    <img src="{{ url_for('qr_png') }}" alt="QR code to guest website" />
+    <div class="hint">This will open the guest lookup page.</div>
+  </div>
+</body>
+</html>

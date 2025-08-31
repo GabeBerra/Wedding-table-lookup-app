@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Find Your Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Mobile-first improvements & grid */
+    input, button { width: 100%; max-width: 420px; box-sizing: border-box; }
+    form { width: 100%; max-width: 520px; margin: 0 auto; }
+    .results { margin-top: 32px; padding: 0 12px; }
+    .guest-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 3px 8px rgba(0,0,0,.08);
+      font-size: 16px;
+      line-height: 1.25;
+      min-height: 64px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .card span { display: block; font-size: 13px; color: #888; margin-top: 4px; }
+    @media (min-width: 640px) {
+      .guest-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    }
+    @media (min-width: 1024px) {
+      .guest-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+      .card { font-size: 17px; }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h2>💍 Find Your Table 💐</h2>
+    <form method="POST">
+      <input type="text" name="first_name" placeholder="First Name" required autocomplete="given-name"><br>
+      <input type="text" name="last_name" placeholder="Last Name" required autocomplete="family-name"><br>
+      <input type="text" name="nickname" placeholder="Nickname" required><br>
+      <button type="submit">Find My Table</button>
+    </form>
+
+    {% if result %}
+      <div class="results">
+        <h3 class="table-number">Your Table Number: <strong>{{ result }}</strong></h3>
+        <div class="guest-cards">
+          {% for g in guests %}
+            <div class="card">
+              <div>
+                {{ g.first }} {{ g.last }}
+                <span>({{ g.nick }})</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% elif result == None and request.method == 'POST' %}
+      <div class="results">
+        <div style="color:#b00020;">No guest found. Please check your spelling.</div>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
