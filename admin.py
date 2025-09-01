@@ -44,15 +44,34 @@ AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 def _s3_client():
     return boto3.client("s3", region_name=AWS_REGION)
 
+def _create_empty_workbook():
+    wb = openpyxl.Workbook()
+    sh = wb.active
+    sh.append(["FirstName", "LastName", "Nickname", "TableNumber"])
+    return wb
+
 def _load_workbook_from_s3():
+ # Local dev fallback
     if not S3_BUCKET:
-        # fallback to local file for dev
+        if not os.path.exists("data.xlsx"):
+            _create_empty_workbook().save("data.xlsx")
         return openpyxl.load_workbook("data.xlsx")
+
     s3 = _s3_client()
     bio = io.BytesIO()
-    s3.download_fileobj(S3_BUCKET, S3_KEY, bio)
-    bio.seek(0)
-    return openpyxl.load_workbook(bio)
+    try:
+        s3.download_fileobj(S3_BUCKET, S3_KEY, bio)
+        bio.seek(0)
+        return openpyxl.load_workbook(bio)
+    except ClientError as e:
+        code = e.response.get("Error", {}).get("Code", "")
+        # If missing/forbidden for missing object, create it
+        if code in ("NoSuchKey", "404", "403", "AccessDenied"):
+            wb = _create_empty_workbook()
+            _save_workbook_to_s3(wb)
+            return wb
+        # Unknown error: surface it in logs
+        raise
 
 def _save_workbook_to_s3(wb):
     if not S3_BUCKET:
@@ -62,8 +81,10 @@ def _save_workbook_to_s3(wb):
     wb.save(bio)
     bio.seek(0)
     s3 = _s3_client()
-    s3.upload_fileobj(bio, S3_BUCKET, S3_KEY, ExtraArgs={"ContentType":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
-
+    s3.upload_fileobj(
+        bio, S3_BUCKET, S3_KEY,
+        ExtraArgs={"ContentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
+    )
 def load_guests():
     wb = _load_workbook_from_s3()
     sh = wb.active
